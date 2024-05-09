@@ -1,0 +1,203 @@
+<DOCTYPE html>
+    <html lang="id">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <style>
+            #text {
+                font-size: 24px;
+            }
+        </style>
+    </head>
+
+    <body> 
+       <p id="text">
+            <marquee>
+                <h3>Hak Cipta By@Samuel(YANG COPY MATI👌💢)</h3>
+            </marquee>
+        </p>
+
+        <script>
+
+            var colors = ['red', 'blue', 'green', 'orange', 'purple', 'black'];
+            var index = 0;
+
+
+            setInterval(function () {
+                var textElement = document.getElementById('text');
+                textElement.style.color = colors[index];
+                index = (index + 1) % colors.length;
+            }, 1000);
+        </script>
+    </body>
+
+
+
+    <body>
+        <h1>Devoloper @Samuel Mongkol</h1>
+    </body>
+    <title>Tic Tac Toe.com</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        .row {
+            display: flex;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            border: 2px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            cursor: pointer;
+        }
+    </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1>😜 Tic Tac Toe 😜</h1>
+            <div class="row" id="row1">
+                <div class="cell" onclick="handleClick(0, 0)" id="cell00"></div>
+                <div class="cell" onclick="handleClick(0, 1)" id="cell01"></div>
+                <div class="cell" onclick="handleClick(0, 2)" id="cell02"></div>
+            </div>
+            <div class="row" id="row2">
+                <div class="cell" onclick="handleClick(1, 0)" id="cell10"></div>
+                <div class="cell" onclick="handleClick(1, 1)" id="cell11"></div>
+                <div class="cell" onclick="handleClick(1, 2)" id="cell12"></div>
+            </div>
+            <div class="row" id="row3">
+                <div class="cell" onclick="handleClick(2, 0)" id="cell20"></div>
+                <div class="cell" onclick="handleClick(2, 1)" id="cell21"></div>
+                <div class="cell" onclick="handleClick(2, 2)" id="cell22"></div>
+
+            </div>
+            <style>
+                button {
+                    color: blue;
+                    background: #6302ff;
+                    color: whitesmoke;
+                    padding: 8PX 25PX;
+                    border: 1PX solid;
+
+
+
+                }
+            </style>
+            <h2>Monggo di Reset Game nya ༼ つ ◕_◕ ༽つ</h2>
+
+
+            <button onclick="resetGame()">Reset GAME</button>
+
+            <body>
+                <h1>sambil dengerin lagu biar menang(☞ﾟヮﾟ)☞</h1>
+                <h3>Dj joanna</h3>
+                <audio controls src="DJ joanna.mp3.aac"></audio>
+            </body>
+
+            <body>
+                <h3>Tebak aja judul lagunya</h3>
+                <audio controls src="Halo.mp3"></audio>
+            </body>
+
+            <body>
+                <h1>
+                    Prestasi bos(⌐■_■)
+
+                    <video controls src="Rafael.mp4" width="1350px" height="800px"></video>
+
+                </h1>
+            </body>
+ 
+
+            <button type="button">
+                <h3>By one dyrot? Wa</h3>
+            </button>
+
+            <a href="https://wa.me/6282315291272"></href>
+
+
+                <script>
+                    let currentPlayer = 'X';
+                    let board = [
+                        ['', '', ''],
+                        ['', '', ''],
+                        ['', '', '']
+                    ];
+
+                    function handleClick(row, col) {
+                        if (board[row][col] === '' && !isGameOver()) {
+                            board[row][col] = currentPlayer;
+                            document.getElementById(`cell${row}${col}`).innerText = currentPlayer;
+                            if (currentPlayer === 'O') {
+                                currentPlayer = 'X';
+                            } else {
+                                currentPlayer = 'O';
+                            }
+                            if (isGameOver()) {
+                                alert(`Pemain ${currentPlayer} menang!`);
+                            }
+                        }
+                    }
+
+                    function isGameOver() {
+
+                        for (let i = 0; i < 3; i++) {
+                            if (board[i][0] !== '' && board[i][0] === board[i][1] && board[i][1] === board[i][2]) {
+                                return true;
+                            }
+                        }
+
+                        for (let j = 0; j < 3; j++) {
+                            if (board[0][j] !== '' && board[0][j] === board[1][j] && board[1][j] === board[2][j]) {
+                                return true;
+                            }
+
+                        }
+
+                        if (board[0][0] !== '' && board[0][0] === board[1][1] && board[1][1] === board[2][2]) {
+                            return true;
+                        }
+                        if (board[0][2] !== '' && board[0][2] === board[1][1] && board[1][1] === board[2][0]) {
+                            return true;
+                        }
+
+                        for (let row = 0; row < 3; row++) {
+                            for (let col = 0; col < 3; col++) {
+                                if (board[row][col] === '') {
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+
+                    function resetGame() {
+                        currentPlayer = 'X';
+                        board = [
+                            ['', '', ''],
+                            ['', '', ''],
+                            ['', '', '']
+                        ];
+                        for (let i = 0; i < 3; i++) {
+                            for (let j = 0; j < 3; j++) {
+                                document.getElementById(`cell${i}${j}`).innerText = '';
+                            }
+                        }
+                    }
+                </script>
+
+    </body>
+
+    </html>
