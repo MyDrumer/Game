@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permainan Memory</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: #61dafb;
+            margin: 0;
+            overflow: hidden;
+            animation: fadeIn 2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: bold;
+            animation: slideInDown 1s ease-out;
+        }
+
+        @keyframes slideInDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 10px;
+            animation: fadeIn 2s ease-out;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #61dafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            cursor: pointer;
+            position: relative;
+            perspective: 1000px;
+            animation: popIn 0.5s ease-out;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .card-inner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .card-front {
+            background-color: #61dafb;
+            color: #282c34;
+        }
+
+        .card-back {
+            background-color: #21a1f1;
+            transform: rotateY(180deg);
+        }
+
+        .lives {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            animation: slideInUp 1s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #61dafb;
+            color: #282c34;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            animation: slideInUp 1s ease-out;
+        }
+
+        button:hover {
+            background-color: #21a1f1;
+        }
+
+        .music-button {
+            background-color: #21a1f1;
+            color: #fff;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            animation: slideInUp 1s ease-out;
+        }
+
+        .music-button:hover {
+            background-color: #0d7bbf;
+        }
+    </style>
+</head>
+<body>
+    <audio id="background-music" src="https://github.com/Mydrumberr/Mydrumberr/raw/main/believe.mp3" loop></audio>
+<marquee><h3>Salah berarti lu pelupa🗿👍</h3> <h1>Permainan Memory</h1></marquee>
+          <div class="token" id="token">Token: 6</div>
+    <div class="lives" id="lives">Nyawa: 20</div>
+        
+    <div class="board" id="board"></div>
+    <button onclick="resetGame()">Mulai Ulang Permainan</button>
+
+    <button class="music-button" onclick="startMusic()">Mulai Musik</button>
+    <div class="token" id="token">Token: 0</div>
+<button class="token-button" onclick="claimToken()">Ikuti TikTok Kami untuk Mendapatkan Token</button>
+<button class="token-button" onclick="useToken()">Gunakan Token untuk Melihat Ulang Huruf</button>
+
+    <script>
+        const cardsArray = [
+            '🗿', '🗿', '😂', '😂',
+            '🥰', '🥰', '🤫', '🤫',
+            '😶', '😶', '👈', '👈',
+            '🤪', '🤪', '😪', '😪'
+        ];
+
+        let cards = [];
+        let firstCard = null;
+        let secondCard = null;
+        let lockBoard = false;
+        let lives = 12;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function createBoard() {
+            const boardElement = document.getElementById('board');
+            boardElement.innerHTML = '';
+            shuffle(cardsArray);
+            cardsArray.forEach(symbol => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front"></div>
+                        <div class="card-back">${symbol}</div>
+                    </div>
+                `;
+                card.addEventListener('click', () => flipCard(card));
+                boardElement.appendChild(card);
+                cards.push(card);
+            });
+            setTimeout(showAllCards, 500);
+        }
+
+        function showAllCards() {
+            cards.forEach(card => card.classList.add('flipped'));
+            setTimeout(hideAllCards, 4000); n
+        }
+
+        function hideAllCards() {
+            cards.forEach(card => card.classList.remove('flipped'));
+        }
+
+        function flipCard(card) {
+            if (lockBoard || card === firstCard) return;
+
+            card.classList.add('flipped');
+            if (!firstCard) {
+                firstCard = card;
+                return;
+            }
+
+            secondCard = card;
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            const isMatch = firstCard.querySelector('.card-back').textContent === secondCard.querySelector('.card-back').textContent;
+            isMatch ? disableCards() : unflipCards();
+        }
+
+        function disableCards() {
+            firstCard.removeEventListener('click', () => flipCard(firstCard));
+            secondCard.removeEventListener('click', () => flipCard(secondCard));
+            resetBoard();
+        }
+
+        function unflipCards() {
+            lockBoard = true;
+            setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                loseLife();
+                resetBoard();
+            }, 1500);
+        }
+
+        function resetBoard() {
+            [firstCard, secondCard, lockBoard] = [null, null, false];
+        }
+
+        function loseLife() {
+            lives--;
+            document.getElementById('lives').textContent = `Nyawa: ${lives}`;
+            if (lives === 0) {
+                alert('Permainan berakhir! Mulai ulang permainan.');
+                resetGame();
+            }
+        }
+
+        function resetGame() {
+            cards = [];
+            lives = 12;
+            document.getElementById('lives').textContent = `Nyawa: ${lives}`;
+            createBoard();
+            resetBoard();
+        }
+
+        function startMusic() {
+            const backgroundMusic = document.getElementById('background-music');
+            backgroundMusic.play().catch(e => {
+                console.log('Autoplay prevented.');
+            });
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>

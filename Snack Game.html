@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body {
+            background: url('https://images.hdqwalls.com/download/blue-archive-hm-2560x1700.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: rgb(98, 0, 255);
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #5ce0f1;
+        }
+
+        canvas {
+            background-color: #8b00c2;
+            display: block;
+            margin: 20px auto;
+            border: 2px solid #1100ff;
+        }
+
+        .controls {
+            margin: 20px 0;
+            color: #00ffff;
+        }
+
+        button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 20px;
+        }
+
+        p {
+            color: #f4f4f4;
+            margin-top: 20px;
+        }
+
+        .scoreboard {
+            font-size: 18px;
+            color: #f4f4f4;
+        }
+
+        canvas {
+            background-color: #083e5e;
+            border: 2px solid #01eeff;
+            display: block;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        canvas.grid {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Snake Game</h1>
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="scoreboard">
+        <p id="score">Score: 0</p>
+        <p id="highScore">High Score: 0</p>
+        <p id="timeElapsed">Time: 0 seconds</p>
+        <p id="longestTime">Longest Time: 0 seconds</p>
+    </div>
+
+    <div class="controls">
+        <div class="row">
+            <button id="up">↑</button>
+        </div>
+        <div class="row">
+            <button id="left">←</button>
+            <button id="down">↓</button>
+            <button id="right">→</button>
+        </div>
+    </div>
+
+    <button id="reset">Reset Game</button>
+    <p>&copy; 2024 By Samuel Mongkol (087723764705)</p>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = 500;
+        canvas.height = 500;
+
+        canvas.classList.add('grid');  // Add grid for visual guide
+
+        const grid = 50;
+        let count = 0;
+        let speed = 10;
+        let speedIncreaseRate = 0.5;
+        let score = 0;
+        let highScore = 0;
+        let startTime = 0;
+        let timeElapsed = 0;
+        let longestTime = 0;
+
+        let snake = {
+            x: 250,
+            y: 250,
+            dx: grid,
+            dy: 0,
+            cells: [],
+            maxCells: 4
+        };
+
+        let apple = { x: 0, y: 0 };
+        let magicApple = { x: -100, y: -100 };  // Buah ajaib
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+
+        function resetGame() {
+            snake.x = 250;
+            snake.y = 250;
+            snake.cells = [];
+            snake.maxCells = 4;
+            snake.dx = grid;
+            snake.dy = 0;
+            speed = 10;
+            score = 0;
+            timeElapsed = 0;
+            document.getElementById('score').innerText = `Score: ${score}`;
+            document.getElementById('timeElapsed').innerText = `Time: ${timeElapsed} seconds`;
+            placeApple();
+            placeMagicApple();
+            startTime = Date.now();  // Mulai waktu
+        }
+
+        function placeApple() {
+            apple.x = getRandomInt(0, canvas.width / grid) * grid;
+            apple.y = getRandomInt(0, canvas.height / grid) * grid;
+        }
+
+        // Fungsi untuk menempatkan buah ajaib
+        function placeMagicApple() {
+            if (Math.random() < 0.1) {  // 10% kesempatan untuk muncul
+                magicApple.x = getRandomInt(0, canvas.width / grid) * grid;
+                magicApple.y = getRandomInt(0, canvas.height / grid) * grid;
+            } else {
+                magicApple.x = -100;
+                magicApple.y = -100;  // Letakkan di luar layar jika tidak muncul
+            }
+        }
+
+        function update() {
+            if (++count < speed) {
+                return;
+            }
+            count = 0;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            snake.x += snake.dx;
+            snake.y += snake.dy;
+
+            if (snake.x < 0) snake.x = canvas.width - grid;
+            else if (snake.x >= canvas.width) snake.x = 0;
+            if (snake.y < 0) snake.y = canvas.height - grid;
+            else if (snake.y >= canvas.height) snake.y = 0;
+
+            snake.cells.unshift({ x: snake.x, y: snake.y });
+
+            if (snake.cells.length > snake.maxCells) {
+                snake.cells.pop();
+            }
+
+            const gradient = ctx.createRadialGradient(apple.x + 25, apple.y + 25, 10, apple.x + 25, apple.y + 25, 25);
+            gradient.addColorStop(0, "red");
+            gradient.addColorStop(1, "darkred");
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(apple.x + grid / 2, apple.y + grid / 2, grid / 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Gambar buah ajaib (warna biru)
+            if (magicApple.x >= 0 && magicApple.y >= 0) {
+                ctx.fillStyle = 'blue';
+                ctx.beginPath();
+                ctx.arc(magicApple.x + grid / 2, magicApple.y + grid / 2, grid / 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.fillStyle = 'lime';
+            snake.cells.forEach((cell, index) => {
+                ctx.beginPath();
+                ctx.roundRect(cell.x, cell.y, grid, grid, [10]);
+                ctx.fill();
+
+                if (cell.x === apple.x && cell.y === apple.y) {
+                    snake.maxCells++;
+                    score++;
+                    document.getElementById('score').innerText = `Score: ${score}`;
+                    placeApple();
+                    placeMagicApple();
+                    if (speed > 1) speed -= speedIncreaseRate;
+                }
+
+                // Jika ular memakan buah ajaib
+                if (cell.x === magicApple.x && cell.y === magicApple.y) {
+                    snake.maxCells += 3;  // Memperpanjang ular lebih banyak
+                    score += 3;
+                    document.getElementById('score').innerText = `Score: ${score}`;
+                    placeMagicApple();  // Tempatkan ulang buah ajaib
+                }
+
+                for (let i = index + 1; i < snake.cells.length; i++) {
+                    if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+                        if (score > highScore) {
+                            highScore = score;
+                            document.getElementById('highScore').innerText = `High Score: ${highScore}`;
+                        }
+                        if (timeElapsed > longestTime) {
+                            longestTime = timeElapsed;
+                            document.getElementById('longestTime').innerText = `Longest Time: ${longestTime} seconds`;
+                        }
+                        resetGame();
+                    }
+                }
+            });
+
+            timeElapsed = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('timeElapsed').innerText = `Time: ${timeElapsed} seconds`;
+        }
+
+        function changeDirection(e) {
+            if ((e.key === 'ArrowLeft' || e.key === 'a') && snake.dx === 0) {
+                snake.dx = -grid;
+                snake.dy = 0;
+            } else if ((e.key === 'ArrowUp' || e.key === 'w') && snake.dy === 0) {
+                snake.dx = 0;
+                snake.dy = -grid;
+            } else if ((e.key === 'ArrowRight' || e.key === 'd') && snake.dx === 0) {
+                snake.dx = grid;
+                snake.dy = 0;
+            } else if ((e.key === 'ArrowDown' || e.key === 's') && snake.dy === 0) {
+                snake.dx = 0;
+                snake.dy = grid;
+            }
+        }
+
+        function handleButton(direction) {
+            if (direction === "left" && snake.dx === 0) {
+                snake.dx = -grid;
+                snake.dy = 0;
+            } else if (direction === "up" && snake.dy === 0) {
+                snake.dx = 0;
+                snake.dy = -grid;
+            } else if (direction === "right" && snake.dx === 0) {
+                snake.dx = grid;
+                snake.dy = 0;
+            } else if (direction === "down" && snake.dy === 0) {
+                snake.dx = 0;
+                snake.dy = grid;
+            }
+        }
+
+        document.getElementById("up").addEventListener("click", () => handleButton("up"));
+        document.getElementById("left").addEventListener("click", () => handleButton("left"));
+        document.getElementById("right").addEventListener("click", () => handleButton("right"));
+        document.getElementById("down").addEventListener("click", () => handleButton("down"));
+
+        document.addEventListener('keydown', changeDirection);
+
+        function gameLoop() {
+            requestAnimationFrame(gameLoop);
+            update();
+        }
+
+        resetGame();
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+
+</html>
